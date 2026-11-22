@@ -1,0 +1,14 @@
+{
+  "web-app": {
+    "path": "C:/Projects/my-sample-web-app",
+    "description": "Next.js Frontend Application"
+  },
+  "backend-api": {
+    "path": "C:/Projects/fastapi-backend",
+    "description": "Python FastAPI Microservice"
+  },
+  "docs": {
+    "path": "C:/Projects/knowledge-base",
+    "description": "Documentation and Markdown Notes"
+  }
+}
