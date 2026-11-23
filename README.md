@@ -83,6 +83,34 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+---
+
+## 📱 Step-by-Step Telegram Bot & Identity Setup
+
+To use this bridge securely, you need your own Telegram bot token and your permanent numeric Telegram User ID.
+
+### A. Create Your Bot & Get Token (BotFather)
+1. Open Telegram and search for **`@BotFather`** (the official verified bot).
+2. Start the chat and send the command **`/newbot`**.
+3. Choose a friendly **Display Name** (e.g. `Dev Bridge`).
+4. Choose a unique **Username** ending in `bot` or `_bot` (e.g. `my_devbridge_bot`).
+5. BotFather will provide your **HTTP API Token** (`7891234567:AAFl...`). Copy and paste this into `TELEGRAM_BOT_TOKEN` in `.env`.
+
+### B. Discover Your Permanent Numeric Telegram User ID
+In Telegram, changing your `@username` never alters your underlying **Numeric User ID**. RemoteDevBridge authenticates you via this permanent ID:
+1. Search for **`@userinfobot`** or **`@raw_data_bot`** on Telegram and hit Start.
+2. Note your numeric ID (e.g. `Id: 123456789`).
+3. Set this in `.env` under `ALLOWED_USER_IDS` (`ALLOWED_USER_IDS=123456789`).
+
+> [!IMPORTANT]
+> **Zero-Trust Enforcement:** If `ALLOWED_USER_IDS` is omitted or empty, the bot refuses to launch. Unauthorized messages from strangers are silently dropped without response.
+
+### C. Recommended Privacy Setting
+To prevent anyone from adding your private bridge bot to random public groups:
+- In `@BotFather`, run `/setjoingroups`, select your bot, and click **`Disable`**.
+
+---
+
 ### 2. Configure Environment (`.env`)
 Copy `.env.example` to `.env`:
 ```bash
@@ -90,7 +118,7 @@ cp .env.example .env
 ```
 Edit `.env` with your values:
 ```env
-TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+TELEGRAM_BOT_TOKEN=7891234567:AAFlKj9_xYzAbCdEfGhIjKlMnOpQrStUvWx
 ALLOWED_USER_IDS=123456789
 
 # Choose your engine:
@@ -121,10 +149,23 @@ Define your local project mappings:
 ```
 
 ### 4. Run
+
+#### Windows (One-Click Launcher):
+Simply double-click **`start_bot.bat`** in the repository folder!
+
+#### Command Line:
 ```bash
 python main.py
 ```
-Open Telegram, message your bot `/start`, and enjoy mobile development freedom!
+
+---
+
+## 📲 Mobile Quick-Action `[Menu]` Button
+
+RemoteDevBridge automatically registers all available commands with Telegram's servers on startup (`set_my_commands`):
+- **Menu Button:** A blue `[Menu]` button appears right next to the text input box in your Telegram mobile app.
+- **Autocompletion:** Tap the menu button or type `/` in the chat to see a popup list of all commands and descriptions.
+- **Cache Refresh:** If the button does not appear immediately, either type `/` once in the chat or restart your Telegram app to refresh its local cache.
 
 ---
 

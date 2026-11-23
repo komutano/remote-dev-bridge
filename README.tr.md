@@ -83,6 +83,34 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+---
+
+## 📱 Adım Adım Telegram Botu ve Kimlik Kurulumu
+
+Bu köprüyü kullanabilmek için kendinize ait bir Telegram botuna ve değişmeyen sayısal Telegram kimlik numaranıza ihtiyacınız vardır.
+
+### A. Botu Oluşturma ve Token Alma (BotFather)
+1. Telegram arama çubuğuna **`@BotFather`** yazın (resmi onaylı hesap).
+2. Sohbeti başlatıp **`/newbot`** komutunu gönderin.
+3. Botunuza bir **Görünen Ad** verin (Örn: `Murat Dev Bridge`).
+4. Botunuza sonu mutlaka `bot` veya `_bot` ile biten benzersiz bir **Kullanıcı Adı (Username)** verin (Örn: `murat_devbridge_bot`).
+5. BotFather size kırmızı renkle vurgulanan bir **API Token** verecektir (`7891234567:AAFl...`). Bu token'ı `.env` dosyanızdaki `TELEGRAM_BOT_TOKEN` kısmına yapıştırın.
+
+### B. Sayısal Telegram Kullanıcı Kimliğinizi (User ID) Öğrenme
+Telegram'da kullanıcı adınızı değiştirseniz bile **User ID numaranız asla değişmez**. Bot, yabancıların bilgisayarınıza erişmesini engellemek için sizi bu değişmeyen numarayla tanır:
+1. Telegram'da **`@userinfobot`** veya **`@raw_data_bot`** botunu aratıp başlatın.
+2. Botun size gönderdiği karttaki `Id: 123456789` sayısını kopyalayın.
+3. Bu sayıyı `.env` dosyasındaki `ALLOWED_USER_IDS` kısmına yazın (`ALLOWED_USER_IDS=123456789`).
+
+> [!IMPORTANT]
+> **Sıfır Güvenlik Açığı (Zero-Trust):** Eğer `ALLOWED_USER_IDS` boş bırakılırsa bot güvenlik gereği hiç başlamaz. Tanımlı olmayan yabancı biri botunuzu bulup mesaj atsa bile bot hiçbir yanıt vermez ve isteği terminale güvenlik uyarısı düşerek sessizce engeller.
+
+### C. Ekstra Telegram Gizlilik Ayarı (Önerilen)
+Yabancı kişilerin botunuzu rastgele Telegram gruplarına eklemesini engellemek için:
+- `@BotFather` içinde `/setjoingroups` yazın, botunuzu seçin ve **`Disable`** yapın.
+
+---
+
 ### 2. Ayar Dosyasını Oluşturun (`.env`)
 `.env.example` dosyasını `.env` olarak kopyalayın:
 ```bash
@@ -90,14 +118,15 @@ cp .env.example .env
 ```
 `.env` dosyanızı açıp bilgilerinizi girin:
 ```env
-TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+TELEGRAM_BOT_TOKEN=7891234567:AAFlKj9_xYzAbCdEfGhIjKlMnOpQrStUvWx
 ALLOWED_USER_IDS=123456789
 
-# Kullanmak istediğiniz motor:
+# Kullanmak istediğiniz AI motoru:
+# 'gemini-direct' -> Google AI Studio anahtarınızla ek CLI kurmadan doğrudan çalışır
 AI_ENGINE=gemini-direct
 GEMINI_API_KEY=AIzaSySizinGoogleAIStudioAnahtariniz
 
-# Masaüstü IDE başlatıcı:
+# Masaüstü IDE başlatıcı ('code', 'agy', 'cursor'):
 IDE_COMMAND=code
 ```
 
@@ -106,7 +135,7 @@ IDE_COMMAND=code
 ```bash
 cp projects.example.json projects.json
 ```
-Projelerinizi eşleyin:
+Yönetmek istediğiniz yerel projelerinizi eşleyin:
 ```json
 {
   "web-sitem": {
@@ -120,11 +149,39 @@ Projelerinizi eşleyin:
 }
 ```
 
-### 4. Çalıştırın
+### 4. Botu Başlatın
+
+#### Windows Kullanıcıları İçin (Tek Tıkla):
+Klasördeki **`start_bot.bat`** dosyasına çift tıklayarak botu doğrudan başlatabilirsiniz!
+
+#### Komut Satırından:
 ```bash
 python main.py
 ```
-Telegram'dan botunuza `/start` yazarak uzaktan kodlama özgürlüğünün tadını çıkarın!
+
+---
+
+## 📲 Telefondan Hızlı Kullanım ve `[Menü]` Butonu
+
+Telefonda komutları tek tek elle yazmakla uğraşmamanız için RemoteDevBridge, açıldığı anda tüm komutları Telegram sunucularına otomatik olarak kaydeder (`set_my_commands`).
+
+- **Menü Butonu:** Telegram'da botunuzun sohbet ekranını açtığınızda mesaj çubuğunun sol altında mavi bir **`[Menü]`** butonu belirir.
+- **Otomatik Tamamlama:** Butona bastığınızda veya klavyeden sadece tek bir **`/`** yazdığınızda tüm komutlar açıklamalarıyla birlikte listelenir; tek tıkla seçip parametrenizi ekleyebilirsiniz.
+- **Menü Hemen Görünmezse:** Telegram mobil uygulaması arayüzü önbelleğe alabilir. Menünün belirmesi için sohbet çubuğuna bir kez `/` yazmanız veya Telegram uygulamasını kapatıp tekrar açmanız yeterlidir.
+
+Dilerseniz `@BotFather` üzerinden `/setcommands` komutunu kullanarak şu hazır listeyi yapıştırıp menüyü kalıcı da kılabilirsiniz:
+```text
+start - Bot durumu ve yardım menüsü
+projects - Tanımlı projeleri listele
+status - <proje> Git dalı ve temizlik durumu
+diff - <proje> Yapılan değişiklikleri göster
+push - <proje> [mesaj] Değişiklikleri commit ve push et
+ask - <proje> <soru> Salt okunur kod analizi
+do - <proje> <talimat> Dal açarak AI ile kod yazdır
+ls - <proje> [klasör] Dosya ve klasörleri listele
+file - <proje> <yol> Dosya içeriğini oku veya indir
+open - <proje> [yol] Masaüstü IDE ile projeyi aç
+```
 
 ---
 
