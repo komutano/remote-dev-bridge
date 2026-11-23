@@ -5,18 +5,22 @@ from src.engines.direct_gemini import DirectGeminiEngine
 from src.engines.direct_nvidia import DirectNvidiaEngine
 
 
-def create_engine(config: Config) -> BaseAIEngine:
-    """Factory that instantiates the configured AI engine."""
-    engine_name = config.ai_engine.lower().strip()
-
-    if engine_name == "gemini-direct":
+def create_engine_by_name(engine_name: str, config: Config) -> BaseAIEngine:
+    """Instantiates a specific AI engine by name."""
+    name = engine_name.lower().strip()
+    if name in ("gemini-direct", "gemini"):
         return DirectGeminiEngine(config)
-    elif engine_name == "nvidia":
+    elif name in ("nvidia", "nvidia-nim"):
         return DirectNvidiaEngine(config)
-    elif engine_name in ("gemini", "claude", "opencode", "custom"):
+    elif name in ("claude", "opencode", "custom"):
         return CliRunnerEngine(config)
     else:
         raise ValueError(
-            f"Unknown AI_ENGINE '{config.ai_engine}'. "
-            "Supported values: 'gemini-direct', 'nvidia', 'gemini', 'claude', 'opencode', 'custom'."
+            f"Unknown AI engine: '{engine_name}'. "
+            "Supported options: 'gemini-direct', 'nvidia', 'claude', 'opencode', 'custom'."
         )
+
+
+def create_engine(config: Config) -> BaseAIEngine:
+    """Factory that instantiates the configured AI engine."""
+    return create_engine_by_name(config.ai_engine, config)

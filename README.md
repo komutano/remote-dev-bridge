@@ -181,6 +181,7 @@ RemoteDevBridge automatically registers all available commands with Telegram's s
 | Command | Description |
 | :--- | :--- |
 | `/start` | View system status, active engine, and help menu |
+| `/engine [name]` | **AI Engine Switcher:** Switch between Google Gemini, NVIDIA NIM, and Claude via buttons or text |
 | `/ai <question>` | **General AI Advisory:** Ask anything without a project (AML/CFT, architecture, coding) |
 | `/projects` | List all configured project aliases and directory health |
 | `/status <proj>` | Check branch name and working tree status |

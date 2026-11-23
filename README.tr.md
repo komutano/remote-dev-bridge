@@ -197,6 +197,7 @@ open - <proje> [yol] Masaüstü IDE ile projeyi aç
 | Komut | Açıklama |
 | :--- | :--- |
 | `/start` | Bot durumu, aktif motor ve yardım menüsü |
+| `/engine [ad]` | **AI Motoru Seçimi:** Butonlara dokunarak veya yazarak motor değiştirme (`nvidia`, `gemini-direct`) |
 | `/ai <soru>` | **Genel AI Danışmanı:** Projesiz serbest soru sorma (AML/CFT, mimari, mevzuat, kodlama) |
 | `/projects` | Tanımlı projelerin takma adları ve dizin durumları |
 | `/status <proje>` | Git dal adı ve çalışma ağacı durumunu gösterir |

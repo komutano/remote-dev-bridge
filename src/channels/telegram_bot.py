@@ -7,18 +7,24 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable
 
-from telegram import BotCommand, Update
+from telegram import (
+    BotCommand,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Update,
+)
 from telegram.constants import ChatAction
 from telegram.error import BadRequest
 from telegram.ext import (
     Application,
     ApplicationBuilder,
+    CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
 )
 
 from src.config import Config, get_config
-from src.engines import create_engine
+from src.engines import create_engine, create_engine_by_name
 from src.engines.base import BaseAIEngine
 from src import git_guard
 from src.utils import path_guard, text_helpers
@@ -83,6 +89,93 @@ async def _reply_safe(update: Update, text: str, as_code: bool = False, lang: st
                 print(f"[ERROR] Failed to send message: {e}")
 
 
+def _build_engine_keyboard(current_engine: str) -> InlineKeyboardMarkup:
+    """Builds interactive inline buttons for engine switching."""
+    c_lower = (current_engine or "").lower()
+    gemini_mark = "🟢 " if "gemini" in c_lower else ""
+    nvidia_mark = "⚡ " if "nvidia" in c_lower else ""
+    claude_mark = "🧠 " if "claude" in c_lower else ""
+
+    keyboard = [
+        [
+            InlineKeyboardButton(f"{gemini_mark}Google Gemini", callback_data="engine:gemini-direct"),
+            InlineKeyboardButton(f"{nvidia_mark}NVIDIA NIM", callback_data="engine:nvidia"),
+        ],
+        [
+            InlineKeyboardButton(f"{claude_mark}Claude Code", callback_data="engine:claude"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+@auth_required
+async def cmd_engine(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """View or switch the active AI engine."""
+    config: Config = context.bot_data["config"]
+    current_name = context.bot_data.get("active_engine_name", config.ai_engine)
+
+    if context.args:
+        target = context.args[0].lower().strip()
+        try:
+            new_engine = create_engine_by_name(target, config)
+            context.bot_data["engine"] = new_engine
+            context.bot_data["active_engine_name"] = target
+            await update.effective_message.reply_text(
+                f"✅ *AI Motoru Değiştirildi!*\n\n"
+                f"Yeni Aktif Motor: `{target}`\n"
+                f"Tüm `/ai`, `/ask` ve `/do` komutları artık bu motoru kullanacak.",
+                parse_mode="Markdown",
+            )
+        except Exception as e:
+            await update.effective_message.reply_text(f"❌ Motor değiştirilemedi: {e}")
+        return
+
+    # If no argument, show interactive inline keyboard
+    keyboard = _build_engine_keyboard(current_name)
+    await update.effective_message.reply_text(
+        f"🤖 *AI Motoru Seçimi*\n\n"
+        f"Şu anki aktif motor: `{current_name}`\n\n"
+        "Aşağıdaki butonlara dokunarak istediğin yapay zeka motoruna anında geçebilirsin:",
+        reply_markup=keyboard,
+        parse_mode="Markdown",
+    )
+
+
+async def cb_engine_select(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Callback query handler for inline engine buttons."""
+    query = update.callback_query
+    if not query:
+        return
+    await query.answer()
+
+    config: Config = context.bot_data["config"]
+    user_id = query.from_user.id
+    if not config.is_user_authorized(user_id):
+        return
+
+    data = query.data or ""
+    if not data.startswith("engine:"):
+        return
+
+    target_engine = data.split(":", 1)[1]
+    try:
+        new_engine = create_engine_by_name(target_engine, config)
+        context.bot_data["engine"] = new_engine
+        context.bot_data["active_engine_name"] = target_engine
+
+        keyboard = _build_engine_keyboard(target_engine)
+        await query.edit_message_text(
+            f"✅ *AI Motoru Başarıyla Değiştirildi!*\n\n"
+            f"🎯 Yeni Aktif Motor: `{target_engine}`\n"
+            f"Tüm `/ai`, `/ask` ve `/do` komutları artık bu motoru kullanacak.\n\n"
+            "İstediğin zaman motoru tekrar değiştirebilirsin:",
+            reply_markup=keyboard,
+            parse_mode="Markdown",
+        )
+    except Exception as e:
+        await query.edit_message_text(f"❌ Motor değiştirilemedi: {e}")
+
+
 # =====================================================================
 # COMMAND HANDLERS
 # =====================================================================
@@ -91,21 +184,24 @@ async def _reply_safe(update: Update, text: str, as_code: bool = False, lang: st
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Shows system status and command reference."""
     config: Config = context.bot_data["config"]
+    active_engine = context.bot_data.get("active_engine_name", config.ai_engine)
     msg = (
         "🌉 *RemoteDevBridge Online*\n\n"
-        f"🤖 *Active Engine:* `{config.ai_engine}`\n"
+        f"🤖 *Active Engine:* `{active_engine}` (Değiştirmek için: `/engine`)\n"
         f"🖥️ *IDE Command:* `{config.ide_command}`\n"
         f"📁 *Configured Projects:* {len(config.projects)}\n\n"
         "*Available Commands:*\n"
+        "• `/engine [ad]` - AI motorunu butonla veya yazarak değiştir\n"
+        "• `/ai <soru>` - Genel serbest AI danışmanı\n"
         "• `/projects` - List all configured projects\n"
         "• `/status <proj>` - Check git branch & clean status\n"
         "• `/diff <proj>` - View unstaged/staged code changes\n"
         "• `/push <proj> [msg]` - Stage, commit & push current branch\n"
-        "• `/ask <proj> <question>` - Read-only code analysis\n"
-        "• `/do <proj> <instruction>` - Auto-branch & execute code edit\n"
-        "• `/ls <proj> [subfolder]` - Browse project files securely\n"
-        "• `/file <proj> <filepath>` - Read or download file content\n"
-        "• `/open <proj> [filepath]` - Launch on desktop editor\n"
+        "• `/ask [proj] <q>` - Read-only code analysis or general Q\n"
+        "• `/do <proj> <inst>` - Auto-branch & execute code edit\n"
+        "• `/ls <proj> [sub]` - Browse project files securely\n"
+        "• `/file <proj> <path>` - Read or download file content\n"
+        "• `/open <proj> [path]` - Launch on desktop editor\n"
     )
     await update.effective_message.reply_text(msg, parse_mode="Markdown")
 
@@ -511,6 +607,7 @@ async def post_init(application: Application):
     """Automatically registers bot commands for Telegram's mobile autocomplete menu."""
     commands = [
         BotCommand("start", "Bot durumu ve yardım menüsü"),
+        BotCommand("engine", "[ad] AI motorunu butonla veya yazarak değiştir"),
         BotCommand("ai", "<soru> Genel AI danışmanı (AML/CFT, mimari, serbest soru)"),
         BotCommand("projects", "Tanımlı projeleri listele"),
         BotCommand("status", "<proje> Git dalı ve temizlik durumu"),
@@ -535,9 +632,12 @@ def setup_application(config: Config) -> Application:
     # Attach shared state
     app.bot_data["config"] = config
     app.bot_data["engine"] = engine
+    app.bot_data["active_engine_name"] = config.ai_engine
 
     # Register command handlers
     app.add_handler(CommandHandler("start", cmd_start))
+    app.add_handler(CommandHandler("engine", cmd_engine))
+    app.add_handler(CallbackQueryHandler(cb_engine_select, pattern=r"^engine:"))
     app.add_handler(CommandHandler("ai", cmd_ai))
     app.add_handler(CommandHandler("projects", cmd_projects))
     app.add_handler(CommandHandler("status", cmd_status))
