@@ -158,6 +158,13 @@ Simply double-click **`start_bot.bat`** in the repository folder!
 python main.py
 ```
 
+> [!IMPORTANT]
+> **Keeping the Process Running:**  
+> RemoteDevBridge executes commands locally on your machine. Therefore, **the terminal window and your computer must remain running.**  
+> - **Locking Your Screen is Fine:** You can lock your workstation (`Win + L`) when leaving your desk; the bot continues running headlessly in the background.  
+> - **Minimize to Taskbar:** You can safely minimize the console window.  
+> - **If Closed or Sleeping:** If you terminate the console window or the PC goes into sleep/shut-down mode, the bot goes offline. Messages sent while offline will be queued by Telegram and automatically processed as soon as you relaunch the bot.
+
 ---
 
 ## 📲 Mobile Quick-Action `[Menu]` Button

@@ -159,6 +159,13 @@ Klasördeki **`start_bot.bat`** dosyasına çift tıklayarak botu doğrudan baş
 python main.py
 ```
 
+> [!IMPORTANT]
+> **Pencerenin Açık Kalması Hakkında:**  
+> RemoteDevBridge, komutları doğrudan kendi yerel bilgisayarınızda çalıştıran bir köprüdür. Bu nedenle **açılan terminal penceresinin ve bilgisayarınızın açık kalması gerekir.**  
+> - **Ekranı Kilitleyebilirsiniz:** Masanızdan kalkarken ekranınızı kilitleyebilirsiniz (`Win + L`); ekran kilitli olsa dahi bot arka planda çalışmaya ve telefonunuzdan gelen talimatları yerine getirmeye devam eder.  
+> - **Simge Durumuna Küçültebilirsiniz:** Konsol penceresini görev çubuğuna küçültebilirsiniz.  
+> - **Pencere Kapanırsa:** Terminal penceresini tamamen kapatırsanız veya bilgisayar uyku/kapanma moduna geçerse bot uykuya dalar ve mesajlara yanıt veremez (ancak botu tekrar açtığınız anda birikmiş mesajlar sırayla işlenir).
+
 ---
 
 ## 📲 Telefondan Hızlı Kullanım ve `[Menü]` Butonu
