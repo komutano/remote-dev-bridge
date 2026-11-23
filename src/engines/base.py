@@ -17,7 +17,7 @@ class BaseAIEngine(ABC):
     async def ask_general(self, prompt: str) -> str:
         """
         General question mode: answers questions directly without any
-        project directory context (e.g. AML/CFT, algorithms, general knowledge).
+        project directory context (e.g. algorithms, architecture, general knowledge).
         """
         pass
 

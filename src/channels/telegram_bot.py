@@ -311,10 +311,10 @@ async def cmd_push(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @auth_required
 async def cmd_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Answers general technical, compliance, or coding questions directly without any project context."""
+    """Answers general technical, coding, or architecture questions directly without any project context."""
     if not context.args:
         await update.effective_message.reply_text(
-            "Kullanım: `/ai <soru>`\n\nÖrnek:\n`/ai AML/CFT uyumunda peel chain tespiti nasıl yapılır?`",
+            "Kullanım: `/ai <soru>`\n\nÖrnek:\n`/ai Python'da asenkron kuyruk yönetimi nasıl tasarlanır?`",
             parse_mode="Markdown",
         )
         return
@@ -343,7 +343,7 @@ async def cmd_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.effective_message.reply_text(
             "Kullanım:\n"
             "• `/ask <proje> <soru>` (Proje kodlarını inceleyerek yanıtlar)\n"
-            "• `/ask <soru>` (Genel soru: AML/CFT, mimari vb.)",
+            "• `/ask <soru>` (Genel soru: algoritmalar, mimari vb.)",
             parse_mode="Markdown"
         )
         return
@@ -387,7 +387,7 @@ async def cmd_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await typing_task
                 git_guard.lock_manager.mark_finished(first_arg)
     else:
-        # General query fallback (e.g. /ask AML/CFT risk göstergeleri nelerdir?)
+        # General query fallback
         full_question = " ".join(context.args).strip()
         stop_typing = asyncio.Event()
         typing_task = asyncio.create_task(_keep_typing(context, update.effective_chat.id, stop_typing))
@@ -608,7 +608,7 @@ async def post_init(application: Application):
     commands = [
         BotCommand("start", "Bot durumu ve yardım menüsü"),
         BotCommand("engine", "[ad] AI motorunu butonla veya yazarak değiştir"),
-        BotCommand("ai", "<soru> Genel AI danışmanı (AML/CFT, mimari, serbest soru)"),
+        BotCommand("ai", "<soru> Genel AI danışmanı (algoritmalar, mimari, serbest soru)"),
         BotCommand("projects", "Tanımlı projeleri listele"),
         BotCommand("status", "<proje> Git dalı ve temizlik durumu"),
         BotCommand("diff", "<proje> Yapılan değişiklikleri göster"),

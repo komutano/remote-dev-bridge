@@ -115,8 +115,7 @@ class DirectGeminiEngine(BaseAIEngine):
         system_instruction = (
             "You are an expert AI consultant and senior engineer communicating remotely via Telegram. "
             "Answer the user's question clearly, thoroughly, and concisely with structured markdown. "
-            "Cover compliance (AML/CFT, blockchain intelligence, financial crime), programming, security, "
-            "and architecture with high technical accuracy."
+            "Cover software engineering, algorithms, security, and architecture with high technical accuracy."
         )
         return await self._call_gemini_api(system_instruction, prompt)
 

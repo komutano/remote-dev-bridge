@@ -198,7 +198,7 @@ open - <proje> [yol] Masaüstü IDE ile projeyi aç
 | :--- | :--- |
 | `/start` | Bot durumu, aktif motor ve yardım menüsü |
 | `/engine [ad]` | **AI Motoru Seçimi:** Butonlara dokunarak veya yazarak motor değiştirme (`nvidia`, `gemini-direct`) |
-| `/ai <soru>` | **Genel AI Danışmanı:** Projesiz serbest soru sorma (AML/CFT, mimari, mevzuat, kodlama) |
+| `/ai <soru>` | **Genel AI Danışmanı:** Projesiz serbest soru sorma (algoritmalar, mimari, hata çözümü, kodlama) |
 | `/projects` | Tanımlı projelerin takma adları ve dizin durumları |
 | `/status <proje>` | Git dal adı ve çalışma ağacı durumunu gösterir |
 | `/diff <proje>` | Yapılan değişikliklerin satır satır farklarını (`git diff`) döner |
@@ -221,7 +221,7 @@ RemoteDevBridge, mobil uzaktan kodlama ve otonom yazılım geliştirme deneyimin
   - ✅ Sıfır Güven (Zero-Trust) yetkilendirme, Git Dirty Tree koruması ve Path Traversal önleme.
   - ✅ Mobilden tam Git döngüsü (`/do`, `/status`, `/diff`, `/push`).
   - ✅ Dosya gezgini (`/ls`, `/file`) ve masaüstü IDE başlatıcı (`/open`).
-  - ✅ Projesiz serbest teknik ve mevzuat danışmanı (`/ai` - AML/CFT, mimari, kod).
+  - ✅ Projesiz serbest teknik ve yazılım danışmanı (`/ai` - mimari, algoritmalar, kod).
 
 - [ ] **v1.5 (Yakında - Geliştirme Aşamasında):**
   - 🔄 **İnteraktif Terminal Köprüsü (Human-in-the-Loop PTY):** Claude Code veya CLI ajanları çalışırken durup onay istediğinde (*"Değişikliği onaylıyor musunuz? (Y/n)"*), sorunun Telegram'a butonlarla (`[ ✅ Onayla ]` / `[ ❌ Reddet ]`) gelmesi ve verilen yanıtın gerçek zamanlı olarak bilgisayardaki terminale aktarılması.

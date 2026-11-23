@@ -92,11 +92,11 @@ class DirectNvidiaEngine(BaseAIEngine):
         return await self._call_nvidia_api(system_instruction, user_content)
 
     async def ask_general(self, prompt: str) -> str:
-        """General AI advisory mode (AML/CFT, coding, architecture)."""
+        """General AI advisory mode (algorithms, coding, architecture)."""
         system_instruction = (
             "You are an expert AI consultant powered by NVIDIA NIM. "
             "Answer clearly, thoroughly, and concisely in Turkish with clean Markdown. "
-            "Cover compliance (AML/CFT, blockchain intelligence), software engineering, and security."
+            "Cover software engineering, algorithms, system design, and security."
         )
         return await self._call_nvidia_api(system_instruction, prompt)
 
