@@ -195,6 +195,28 @@ RemoteDevBridge automatically registers all available commands with Telegram's s
 
 ---
 
+## 🗺️ Roadmap & Future Horizons
+
+RemoteDevBridge is evolving rapidly to deliver the ultimate mobile development and autonomous agent experience:
+
+- [x] **v1.0 (Current Release):**
+  - ✅ Dual native cloud engines: Google AI Studio (Gemini) & NVIDIA NIM (Nemotron).
+  - ✅ On-the-fly interactive engine switcher (`/engine`) with Telegram inline buttons.
+  - ✅ Zero-Trust authorization, path traversal protection, and Git working tree safeguards.
+  - ✅ Full mobile Git lifecycle (`/do`, `/status`, `/diff`, `/push`).
+  - ✅ File explorer (`/ls`, `/file`) and remote desktop IDE launcher (`/open`).
+  - ✅ General AI advisory mode (`/ai` for AML/CFT, architecture, coding).
+
+- [ ] **v1.5 (In Progress):**
+  - 🔄 **Interactive Human-in-the-Loop PTY Bridge:** Stream interactive CLI prompts (Claude Code, Aider, OpenCode) directly to Telegram. When an agent pauses to ask for confirmation (*"Proceed with file edit? (Y/n)"*), interactive buttons (`[ ✅ Approve ]` / `[ ❌ Reject ]`) appear in chat, and responses are piped to the terminal in real-time.
+  - 🔄 **Multi-Channel Adapters:** Discord bot and Slack webhook integrations.
+
+- [ ] **v2.0 (Planned Milestones):**
+  - 🚀 **Native Antigravity IDE Integration (MCP Server):** Dedicated MCP server and webhook bridge connecting Antigravity directly to Telegram. Receive real-time progress updates and approve pending agent actions while away from your desk.
+  - 🎙️ **Voice-to-Code:** Transcribe Telegram voice notes directly into actionable code modifications via Gemini audio understanding.
+
+---
+
 ## 🙏 Developer Acknowledgments & Special Thanks
 
 As developers building on the frontier of agentic engineering, we would like to express our heartfelt gratitude to:

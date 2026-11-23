@@ -211,6 +211,28 @@ open - <proje> [yol] Masaüstü IDE ile projeyi aç
 
 ---
 
+## 🗺️ Gelecek Yol Haritası (Roadmap)
+
+RemoteDevBridge, mobil uzaktan kodlama ve otonom yazılım geliştirme deneyimini en üst seviyeye taşımak için sürekli gelişmektedir:
+
+- [x] **v1.0 (Mevcut Sürüm - Yayında):**
+  - ✅ Google AI Studio (Gemini) ve NVIDIA NIM (Nemotron) doğrudan çift motor desteği.
+  - ✅ Telegram üzerinden tek dokunuşla interaktif motor değiştirici (`/engine`).
+  - ✅ Sıfır Güven (Zero-Trust) yetkilendirme, Git Dirty Tree koruması ve Path Traversal önleme.
+  - ✅ Mobilden tam Git döngüsü (`/do`, `/status`, `/diff`, `/push`).
+  - ✅ Dosya gezgini (`/ls`, `/file`) ve masaüstü IDE başlatıcı (`/open`).
+  - ✅ Projesiz serbest teknik ve mevzuat danışmanı (`/ai` - AML/CFT, mimari, kod).
+
+- [ ] **v1.5 (Yakında - Geliştirme Aşamasında):**
+  - 🔄 **İnteraktif Terminal Köprüsü (Human-in-the-Loop PTY):** Claude Code veya CLI ajanları çalışırken durup onay istediğinde (*"Değişikliği onaylıyor musunuz? (Y/n)"*), sorunun Telegram'a butonlarla (`[ ✅ Onayla ]` / `[ ❌ Reddet ]`) gelmesi ve verilen yanıtın gerçek zamanlı olarak bilgisayardaki terminale aktarılması.
+  - 🔄 **Çoklu Kanal Desteği:** Discord Botu ve Slack webhook adaptörleri.
+
+- [ ] **v2.0 (Planlanan Gelecek Hedefleri):**
+  - 🚀 **Doğrudan Antigravity IDE Entegrasyonu (MCP Server):** Antigravity için yerel MCP (Model Context Protocol) sunucusu. Masanızdan kalktığınızda Antigravity'deki uzun süren görevlerin ilerleme durumunun ve onay isteklerinin doğrudan Telegram'a anlık bildirim olarak akması.
+  - 🎙️ **Sesli Kodlama (Voice-to-Code):** Telegram'dan atılan sesli mesajların otomatik olarak çözümlenip kodlama talimatına dönüştürülmesi.
+
+---
+
 ## 🙏 Geliştirici Teşekkürü
 
 Açık kaynak dünyasında üretken yapay zekayı ve otonom yazılım geliştirmeyi ileriye taşıyan iki büyük teknoloji ekibine içtenlikle teşekkür ederiz:
