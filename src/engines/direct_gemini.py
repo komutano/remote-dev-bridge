@@ -60,12 +60,35 @@ class DirectGeminiEngine(BaseAIEngine):
                 system_instruction=system_instruction,
                 temperature=0.2,
             )
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=user_content,
-                config=config,
-            )
-            return response.text or "(Empty response received from Gemini)"
+
+            # Preferred candidate models with automatic fallback
+            candidates = [
+                self.config.gemini_model,
+                "gemini-3.1-flash-lite",
+                "gemini-2.5-flash-lite",
+                "gemini-3.8-flash",
+            ]
+            # Remove duplicates preserving order
+            unique_models = []
+            for m in candidates:
+                if m and m not in unique_models:
+                    unique_models.append(m)
+
+            last_error = None
+            for model_name in unique_models:
+                try:
+                    response = client.models.generate_content(
+                        model=model_name,
+                        contents=user_content,
+                        config=config,
+                    )
+                    if response.text:
+                        return response.text
+                except Exception as err:
+                    last_error = err
+                    continue
+
+            return f"❌ Google AI Studio API Error (All models failed): {str(last_error)}"
 
         try:
             return await asyncio.to_thread(_sync_generate)
