@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable
 
-from telegram import Update
+from telegram import BotCommand, Update
 from telegram.constants import ChatAction
 from telegram.error import BadRequest
 from telegram.ext import (
@@ -457,9 +457,26 @@ async def cmd_open(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.effective_message.reply_text(f"❌ Failed to launch IDE `{ide_cmd}`:\n{str(e)}")
 
 
+async def post_init(application: Application):
+    """Automatically registers bot commands for Telegram's mobile autocomplete menu."""
+    commands = [
+        BotCommand("start", "Bot durumu ve yardım menüsü"),
+        BotCommand("projects", "Tanımlı projeleri listele"),
+        BotCommand("status", "<proje> Git dalı ve temizlik durumu"),
+        BotCommand("diff", "<proje> Yapılan değişiklikleri göster"),
+        BotCommand("push", "<proje> [mesaj] Değişiklikleri commit ve push et"),
+        BotCommand("ask", "<proje> <soru> Salt okunur kod analizi"),
+        BotCommand("do", "<proje> <talimat> Dal açarak AI ile kod yazdır"),
+        BotCommand("ls", "<proje> [klasör] Dosya ve klasörleri listele"),
+        BotCommand("file", "<proje> <yol> Dosya içeriğini oku veya indir"),
+        BotCommand("open", "<proje> [yol] Masaüstü IDE ile projeyi aç"),
+    ]
+    await application.bot.set_my_commands(commands)
+
+
 def setup_application(config: Config) -> Application:
     """Configures and returns the python-telegram-bot Application."""
-    app = ApplicationBuilder().token(config.telegram_token).build()
+    app = ApplicationBuilder().token(config.telegram_token).post_init(post_init).build()
 
     # Create AI engine instance
     engine = create_engine(config)
