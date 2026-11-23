@@ -14,6 +14,14 @@ class BaseAIEngine(ABC):
         pass
 
     @abstractmethod
+    async def ask_general(self, prompt: str) -> str:
+        """
+        General question mode: answers questions directly without any
+        project directory context (e.g. AML/CFT, algorithms, general knowledge).
+        """
+        pass
+
+    @abstractmethod
     async def execute(self, prompt: str, project_path: Path) -> str:
         """
         Modification mode: instructs the AI to apply code changes

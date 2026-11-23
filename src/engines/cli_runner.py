@@ -122,6 +122,12 @@ class CliRunnerEngine(BaseAIEngine):
         cmd_str = self._resolve_command(prompt, project_path, read_only=True)
         return await self._execute_command(cmd_str, project_path)
 
+    async def ask_general(self, prompt: str) -> str:
+        # For CLI runners, run from base directory
+        base_dir = Path.cwd()
+        cmd_str = self._resolve_command(prompt, base_dir, read_only=True)
+        return await self._execute_command(cmd_str, base_dir)
+
     async def execute(self, prompt: str, project_path: Path) -> str:
         cmd_str = self._resolve_command(prompt, project_path, read_only=False)
         return await self._execute_command(cmd_str, project_path)

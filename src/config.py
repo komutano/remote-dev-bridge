@@ -51,7 +51,7 @@ class Config:
         # Engine settings
         self.ai_engine = os.getenv("AI_ENGINE", "gemini-direct").strip().lower()
         self.gemini_api_key = os.getenv("GEMINI_API_KEY", "").strip()
-        self.gemini_model = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite").strip()
+        self.gemini_model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
         self.anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
         self.openai_api_key = os.getenv("OPENAI_API_KEY", "").strip()
         self.openai_base_url = os.getenv("OPENAI_BASE_URL", "https://integrate.api.nvidia.com/v1").strip()

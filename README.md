@@ -181,11 +181,12 @@ RemoteDevBridge automatically registers all available commands with Telegram's s
 | Command | Description |
 | :--- | :--- |
 | `/start` | View system status, active engine, and help menu |
+| `/ai <question>` | **General AI Advisory:** Ask anything without a project (AML/CFT, architecture, coding) |
 | `/projects` | List all configured project aliases and directory health |
 | `/status <proj>` | Check branch name and working tree status |
 | `/diff <proj>` | Inspect line-by-line differences of unstaged/staged edits |
 | `/push <proj> [msg]` | Stage all changes, commit, and push branch to origin |
-| `/ask <proj> <q>` | Ask questions in read-only mode (does not alter files) |
+| `/ask [proj] <q>` | Analyze project codebase (falls back to general question if no project given) |
 | `/do <proj> <inst>` | Auto-branch and apply code modifications with AI |
 | `/ls <proj> [dir]` | Explore folders (traversal-safe, ignores build artifacts) |
 | `/file <proj> <path>` | Read source files or download documents |

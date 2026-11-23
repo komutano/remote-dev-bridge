@@ -214,44 +214,94 @@ async def cmd_push(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @auth_required
-async def cmd_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Executes read-only code analysis."""
-    if len(context.args) < 2:
-        await update.effective_message.reply_text("Usage: `/ask <project_alias> <question>`", parse_mode="Markdown")
-        return
-
-    alias = context.args[0].lower()
-    question = " ".join(context.args[1:]).strip()
-
-    config: Config = context.bot_data["config"]
-    engine: BaseAIEngine = context.bot_data["engine"]
-    proj = config.get_project(alias)
-    if not proj:
-        await update.effective_message.reply_text(f"❌ Unknown project: `{alias}`", parse_mode="Markdown")
-        return
-
-    lock = git_guard.lock_manager.get_lock(alias)
-    if lock.locked():
-        info = git_guard.lock_manager.get_active_info(alias)
-        started_str = info[0].strftime("%H:%M:%S") if info else "earlier"
+async def cmd_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Answers general technical, compliance, or coding questions directly without any project context."""
+    if not context.args:
         await update.effective_message.reply_text(
-            f"⚠️ Project `{alias}` is busy (Started: {started_str}). Please wait.",
+            "Kullanım: `/ai <soru>`\n\nÖrnek:\n`/ai AML/CFT uyumunda peel chain tespiti nasıl yapılır?`",
+            parse_mode="Markdown",
+        )
+        return
+
+    question = " ".join(context.args).strip()
+    engine: BaseAIEngine = context.bot_data["engine"]
+
+    stop_typing = asyncio.Event()
+    typing_task = asyncio.create_task(_keep_typing(context, update.effective_chat.id, stop_typing))
+    try:
+        await update.effective_message.reply_text("💡 Genel AI Danışmanı yanıtlıyor...")
+        response = await engine.ask_general(question)
+        await _reply_safe(update, response)
+    finally:
+        stop_typing.set()
+        await typing_task
+
+
+@auth_required
+async def cmd_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Executes read-only code analysis if first argument matches a configured project.
+    Otherwise, gracefully falls back to answering as a general AI advisory question.
+    """
+    if not context.args:
+        await update.effective_message.reply_text(
+            "Kullanım:\n"
+            "• `/ask <proje> <soru>` (Proje kodlarını inceleyerek yanıtlar)\n"
+            "• `/ask <soru>` (Genel soru: AML/CFT, mimari vb.)",
             parse_mode="Markdown"
         )
         return
 
-    async with lock:
-        git_guard.lock_manager.mark_started(alias, "/ask")
+    config: Config = context.bot_data["config"]
+    engine: BaseAIEngine = context.bot_data["engine"]
+
+    first_arg = context.args[0].lower()
+    proj = config.get_project(first_arg)
+
+    if proj:
+        # Project-specific query
+        if len(context.args) < 2:
+            await update.effective_message.reply_text(
+                f"Kullanım: `/ask {first_arg} <sorunuz>`",
+                parse_mode="Markdown"
+            )
+            return
+
+        question = " ".join(context.args[1:]).strip()
+        lock = git_guard.lock_manager.get_lock(first_arg)
+        if lock.locked():
+            info = git_guard.lock_manager.get_active_info(first_arg)
+            started_str = info[0].strftime("%H:%M:%S") if info else "earlier"
+            await update.effective_message.reply_text(
+                f"⚠️ `{first_arg}` projesinde işlem sürüyor (Başlangıç: {started_str}). Lütfen bekleyin.",
+                parse_mode="Markdown"
+            )
+            return
+
+        async with lock:
+            git_guard.lock_manager.mark_started(first_arg, "/ask")
+            stop_typing = asyncio.Event()
+            typing_task = asyncio.create_task(_keep_typing(context, update.effective_chat.id, stop_typing))
+            try:
+                await update.effective_message.reply_text(f"🔍 `{first_arg}` projesi analiz ediliyor...")
+                response = await engine.ask(question, proj.path)
+                await _reply_safe(update, response)
+            finally:
+                stop_typing.set()
+                await typing_task
+                git_guard.lock_manager.mark_finished(first_arg)
+    else:
+        # General query fallback (e.g. /ask AML/CFT risk göstergeleri nelerdir?)
+        full_question = " ".join(context.args).strip()
         stop_typing = asyncio.Event()
         typing_task = asyncio.create_task(_keep_typing(context, update.effective_chat.id, stop_typing))
         try:
-            await update.effective_message.reply_text(f"🔍 Analyzing `{alias}` in read-only mode...")
-            response = await engine.ask(question, proj.path)
+            await update.effective_message.reply_text("💡 Genel AI Danışmanı yanıtlıyor...")
+            response = await engine.ask_general(full_question)
             await _reply_safe(update, response)
         finally:
             stop_typing.set()
             await typing_task
-            git_guard.lock_manager.mark_finished(alias)
 
 
 @auth_required
@@ -461,11 +511,12 @@ async def post_init(application: Application):
     """Automatically registers bot commands for Telegram's mobile autocomplete menu."""
     commands = [
         BotCommand("start", "Bot durumu ve yardım menüsü"),
+        BotCommand("ai", "<soru> Genel AI danışmanı (AML/CFT, mimari, serbest soru)"),
         BotCommand("projects", "Tanımlı projeleri listele"),
         BotCommand("status", "<proje> Git dalı ve temizlik durumu"),
         BotCommand("diff", "<proje> Yapılan değişiklikleri göster"),
         BotCommand("push", "<proje> [mesaj] Değişiklikleri commit ve push et"),
-        BotCommand("ask", "<proje> <soru> Salt okunur kod analizi"),
+        BotCommand("ask", "[proje] <soru> Kod analizi veya genel soru"),
         BotCommand("do", "<proje> <talimat> Dal açarak AI ile kod yazdır"),
         BotCommand("ls", "<proje> [klasör] Dosya ve klasörleri listele"),
         BotCommand("file", "<proje> <yol> Dosya içeriğini oku veya indir"),
@@ -487,6 +538,7 @@ def setup_application(config: Config) -> Application:
 
     # Register command handlers
     app.add_handler(CommandHandler("start", cmd_start))
+    app.add_handler(CommandHandler("ai", cmd_ai))
     app.add_handler(CommandHandler("projects", cmd_projects))
     app.add_handler(CommandHandler("status", cmd_status))
     app.add_handler(CommandHandler("diff", cmd_diff))

@@ -64,9 +64,10 @@ class DirectGeminiEngine(BaseAIEngine):
             # Preferred candidate models with automatic fallback
             candidates = [
                 self.config.gemini_model,
+                "gemini-3.5-flash-lite",
                 "gemini-3.1-flash-lite",
-                "gemini-2.5-flash-lite",
                 "gemini-3.8-flash",
+                "gemma-4-26b-a4b-it",
             ]
             # Remove duplicates preserving order
             unique_models = []
@@ -108,6 +109,16 @@ class DirectGeminiEngine(BaseAIEngine):
             f"User Question/Request:\n{prompt}"
         )
         return await self._call_gemini_api(system_instruction, user_content)
+
+    async def ask_general(self, prompt: str) -> str:
+        """General AI advisory mode: answers any technical, compliance, or architecture question directly."""
+        system_instruction = (
+            "You are an expert AI consultant and senior engineer communicating remotely via Telegram. "
+            "Answer the user's question clearly, thoroughly, and concisely with structured markdown. "
+            "Cover compliance (AML/CFT, blockchain intelligence, financial crime), programming, security, "
+            "and architecture with high technical accuracy."
+        )
+        return await self._call_gemini_api(system_instruction, prompt)
 
     async def execute(self, prompt: str, project_path: Path) -> str:
         """Instruction execution mode."""

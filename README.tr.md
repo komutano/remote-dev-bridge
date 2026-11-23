@@ -197,11 +197,12 @@ open - <proje> [yol] Masaüstü IDE ile projeyi aç
 | Komut | Açıklama |
 | :--- | :--- |
 | `/start` | Bot durumu, aktif motor ve yardım menüsü |
+| `/ai <soru>` | **Genel AI Danışmanı:** Projesiz serbest soru sorma (AML/CFT, mimari, mevzuat, kodlama) |
 | `/projects` | Tanımlı projelerin takma adları ve dizin durumları |
 | `/status <proje>` | Git dal adı ve çalışma ağacı durumunu gösterir |
 | `/diff <proje>` | Yapılan değişikliklerin satır satır farklarını (`git diff`) döner |
 | `/push <proje> [mesaj]` | Değişiklikleri sahneler, commit atar ve remote'a push eder |
-| `/ask <proje> <soru>` | Salt okunur analiz (dosyaları değiştirmez) |
+| `/ask [proje] <soru>` | Kod tabanını analiz eder (proje yazılmazsa otomatik genel soruya geçer) |
 | `/do <proje> <talimat>` | Güvenli yeni dal açarak AI'a kod yazdırır |
 | `/ls <proje> [klasor]` | Proje içi dosya ve klasörleri güvenle listeler |
 | `/file <proje> <yol>` | Dosya içeriğini okur veya belge olarak telefona indirir |
